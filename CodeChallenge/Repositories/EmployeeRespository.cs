@@ -29,7 +29,15 @@ namespace CodeChallenge.Repositories
 
         public Employee GetById(string id)
         {
-            return _employeeContext.Employees.SingleOrDefault(e => e.EmployeeId == id);
+            // I was consistently encountering one of the weirdest bugs I've ever seen
+            // For some reason, the Employee.directReports list wouldn't materialize into the employee variable unless I breakpointed on that line
+            // and then expanded the enumerable in Visual Studio...truly bizarre
+            // Of course, I would never do _employeeContext.Employees.ToList() in an actual codebase (as it would materialize that entire table into memory), but was necessary to work around that odd bug
+            // This was something that I tested on the master branch as well, and was a problem with the way the code was originally written
+            var employees = _employeeContext.Employees.ToList();
+
+            var employee = employees.SingleOrDefault(e => e.EmployeeId == id);
+            return employee;
         }
 
         public Task SaveAsync()
