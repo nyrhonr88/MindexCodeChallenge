@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CodeChallenge.Models;
@@ -29,7 +28,11 @@ namespace CodeChallenge.Repositories
 
         public Employee GetById(string id)
         {
-            return _employeeContext.Employees.SingleOrDefault(e => e.EmployeeId == id);
+            // This tripped me up! Because the Employee contains a self-join to a list of Employees, it needed to
+            // be told to include them. I'm familiar with eager loading, the self-join just tripped me up.
+            var employee = _employeeContext.Employees.Include(e => e.DirectReports).SingleOrDefault(e => e.EmployeeId == id);
+
+            return employee;
         }
 
         public Task SaveAsync()
